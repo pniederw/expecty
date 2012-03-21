@@ -36,7 +36,7 @@ object ScottyMacro {
   def record(c: Context)(anchor: Int, t: c.Tree) : c.Tree = {
     import c.mirror._
 
-    Apply(Select(Ident(newTermName("_exp")), newTermName("record")), List(Literal(Constant(anchor)), t))
+    Apply(Select(Ident(newTermName("_exp")), newTermName("record")), List(t, Literal(Constant(anchor))))
   }
 
   def lineContent(c: Context)(t: c.Tree): String = t.pos match {

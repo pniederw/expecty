@@ -5,13 +5,18 @@ import collection.mutable.ListBuffer
 class Condition {
   var values: List[ConditionValue[_]] = List()
 
+  def record[T](value: T, col: Int) : T = {
+    values = ConditionValue(value, col) :: values
+    value
+  }
+
   def verify(cond: Boolean, text: String, ast: String) {
     if (!cond) {
       val intro = new StringBuilder().append("Condition not satisfied:\n\n").append(text)
       val lines = ListBuffer(new StringBuilder)
 
       val sorted = values.sortWith(_.col > _.col)
-      for (value <- sorted) place(value, lines)
+      for (value <- sorted) placeValue(lines, value)
 
       lines.prepend(intro)
       lines.append(new StringBuilder)
@@ -19,41 +24,34 @@ class Condition {
     }
   }
 
-  private[this] def place(value: ConditionValue[_], lines: ListBuffer[StringBuilder]) {
+  private[this] def placeValue(lines: ListBuffer[StringBuilder], value: ConditionValue[_]) {
     val str = value.value.toString()
+    val col = value.col
 
-    insert(lines(0), value.col, "|")
+    placeString(lines(0), "|", col)
 
     for (line <- lines.drop(1)) {
-      if (fits(value, str, line)) {
-        insert(line, value.col, str)
+      if (fits(line, str, col)) {
+        placeString(line, str, col)
         return
       }
-      insert(line, value.col, "|")
+      placeString(line, "|", col)
     }
 
-    val last = new StringBuilder()
-    insert(last, value.col, str)
-    lines.append(last)
+    val newLine = new StringBuilder()
+    placeString(newLine, str, col)
+    lines.append(newLine)
   }
 
-  private[this] def insert(builder: StringBuilder, col: Int,  str: String) {
-    val diff = col - builder.length
-    for (i <- 1 to diff) builder.append(' ')
-    builder.replace(col, col + str.length(), str)
+  private[this] def placeString(line: StringBuilder, str: String, col: Int) {
+    val diff = col - line.length
+    for (i <- 1 to diff) line.append(' ')
+    line.replace(col, col + str.length(), str)
   }
 
-  private[this] def fits(value: ConditionValue[_], str: String, line: StringBuilder): Boolean = {
-    val firstCol = value.col
-    val lastCol = value.col + str.length() + 1
-
-    line.slice(firstCol, lastCol).forall(_.isWhitespace)
-  }
-
-  def record[T](col: Int, value: T) : T = {
-    values = ConditionValue(col, value) :: values
-    value
+  private[this] def fits(line: StringBuilder, str: String, col: Int): Boolean = {
+    line.slice(col, col + str.length() + 1).forall(_.isWhitespace)
   }
 }
 
-case class ConditionValue[T](col: Int, value: T)
+case class ConditionValue[T](value: T, col: Int)
