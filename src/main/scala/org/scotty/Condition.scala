@@ -12,7 +12,7 @@ class Condition {
 
   def verify(cond: Boolean, text: String, ast: String) {
     if (!cond) {
-      val intro = new StringBuilder().append("Condition not satisfied:\n\n").append(text)
+      val intro = new StringBuilder().append("\n\n").append(text)
       val lines = ListBuffer(new StringBuilder)
 
       val sorted = values.sortWith(_.col > _.col)
