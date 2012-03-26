@@ -1,13 +1,18 @@
 apply plugin: "scala"
 apply plugin: "idea"
 
-repositories {
-  mavenCentral()
-  maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
+version = "0.1-SNAPSHOT"
+group = "org.expecty"
 
 ext.useKepler = true
 ext.keplerDir = file("kepler")
+
+repositories {
+  mavenCentral()
+  if (!useKepler) {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+  }
+}
 
 dependencies {
     if (useKepler) {
@@ -58,7 +63,6 @@ if (useKepler) {
     }
     outputs.dir "$keplerDir/dists/latest/lib"
     doLast {
-      //ant.ant(dir: keplerDir, antfile: "build.xml", target: "fastdist", inheritAll: false)
       exec {
         environment "ANT_OPTS", "-Xms512M -Xmx2048M -Xss1M -XX:MaxPermSize=128M"
         workingDir = keplerDir
