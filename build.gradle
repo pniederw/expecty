@@ -28,13 +28,18 @@ dependencies {
     testCompile "junit:junit:4.10"
 }
 
-compileScala {
+compileScala {  
   scalaCompileOptions.with {
     additionalParameters = ["-Xmacros"]
     if (useKepler) {
       additionalParameters += ["-Ymacro-debug", "-Ymacro-copypaste"]
     }
   }
+}
+
+compileTestScala {
+  // compiler doesn't seem to like scripts
+  exclude "**/ExpectyExample.scala"
 }
 
 compileTestScala {
