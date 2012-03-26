@@ -12,18 +12,17 @@ object ExpectyMacro {
       val transformed = transform(c)(cond)
       val source = getSource(c)(cond)
       val ast = showRaw(cond)
-      c.echo(ast)
       (transformed, source, ast)
     }
 
     val exprs = ListBuffer.empty[c.Tree]
-    val expectationClass = staticClass("org.expecty.Expectation")
+    val expectorClass = staticClass(classOf[Expector].getName)
 
     exprs += ValDef(
       Modifiers(),
       newTermName("_exp"),
-      TypeTree(expectationClass.asType),
-      Apply(Select(New(Ident(expectationClass)), newTermName("<init>")), List(opts)))
+      TypeTree(expectorClass.asType),
+      Apply(Select(New(Ident(expectorClass)), newTermName("<init>")), List(opts)))
 
     for (cond <- conds) {
       val (transformed, source, ast) = cond

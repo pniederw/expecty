@@ -5,9 +5,12 @@ object Expecty {
   def expect(cond: Boolean)(implicit opts: Options): Result = macro ExpectyMacro.expect
 }
 
-case class Options(isFailEarly: Boolean = true, isTrace: Boolean = false, isShowTypes: Boolean = false) {
+case class Options(isFail: Boolean = true, isFailEarly: Boolean = true, isTrace: Boolean = false, isShowTypes: Boolean = false) {
+  def fail = copy(isFail = true)
+  def noFail = copy(isFail = false)
+
   def failEarly = copy(isFailEarly = true)
-  def noFailEarly = copy(isFailEarly = false)
+  def failLate = copy(isFailEarly = false)
 
   def trace = copy(isTrace = true)
   def noTrace = copy(isTrace = false)

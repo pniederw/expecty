@@ -3,7 +3,7 @@ package org.expecty
 import scala.collection.mutable.ListBuffer
 import reflect.runtime.Mirror
 
-class Expectation(opts: Options) {
+class Expector(opts: Options) {
   private[this] var captures: List[Capture[_]] = List.empty
   private[this] var failures: List[Failure] = List.empty
 
@@ -16,31 +16,31 @@ class Expectation(opts: Options) {
     value
   }
 
-  def render(text: String): String = {
-    val intro = new StringBuilder().append("\n\n").append(text)
+  def verify(cond: Boolean, text: String, ast: String): Result = {
+    lazy val output = render(text)
+    if (opts.isTrace) println(output)
+    if (!cond) {
+      if (opts.isFail && opts.isFailEarly) throw new AssertionError(output)
+      failures = Failure(captures, output) :: failures
+    }
+    Result(failures)
+  }
+
+  private[this] def render(text: String): String = {
+    val offset = text.prefixLength(_.isWhitespace)
+    val intro = new StringBuilder().append("\n\n").append(text.trim())
     val lines = ListBuffer(new StringBuilder)
 
     val rightToLeft = captures.sortWith(_.col > _.col)
-    for (value <- rightToLeft) placeValue(lines, value)
+    for (value <- rightToLeft) placeValue(lines, value.value, value.col - offset)
 
     lines.prepend(intro)
     lines.append(new StringBuilder)
     lines.mkString("\n")
   }
 
-  def verify(cond: Boolean, text: String, ast: String): Result = {
-    lazy val output = render(text)
-    if (opts.isTrace) println(output)
-    if (!cond) {
-      if (opts.isFailEarly) throw new AssertionError(output)
-      failures = Failure(captures, output) :: failures
-    }
-    Result(failures)
-  }
-
-  private[this] def placeValue(lines: ListBuffer[StringBuilder], value: Capture[_]) {
-    val str = renderValue(value.value)
-    val col = value.col
+  private[this] def placeValue(lines: ListBuffer[StringBuilder], value: Any, col: Int) {
+    val str = renderValue(value)
 
     placeString(lines(0), "|", col)
 
@@ -58,7 +58,7 @@ class Expectation(opts: Options) {
   }
 
   private[this] def renderValue(value: Any): String = {
-    val str = value.toString
+    val str = if (value == null) "null" else value.toString
     if (opts.isShowTypes) str + " (" + Mirror.typeOfInstance(value).typeSymbol.fullName + ")"
     else str
   }
