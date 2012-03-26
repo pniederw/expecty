@@ -3,19 +3,32 @@ apply plugin: "idea"
 
 repositories {
   mavenCentral()
+  maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
-dependencies {
-    scalaTools fileTree(dir: "/swd/prj/kepler/dists/latest/lib")
+ext.useKepler = true
+ext.keplerDir = file("kepler")
 
-    compile files("/swd/prj/kepler/dists/latest/lib/scala-compiler.jar", "/swd/prj/kepler/dists/latest/lib/scala-library.jar")
+dependencies {
+    if (useKepler) {
+      scalaTools fileTree(dir: "kepler/dists/latest/lib")
+      compile files("kepler/dists/latest/lib/scala-compiler.jar")
+      compile files("kepler/dists/latest/lib/scala-library.jar")
+    } else {
+      scalaTools "org.scala-lang:scala-compiler:2.10.0-SNAPSHOT"
+      compile "org.scala-lang:scala-compiler:2.10.0-SNAPSHOT"
+      compile "org.scala-lang:scala-library:2.10.0-SNAPSHOT"
+    }
 
     testCompile "junit:junit:4.10"
 }
 
 compileScala {
   scalaCompileOptions.with {
-    additionalParameters = ["-Xmacros", "-Ymacro-debug", "-Ymacro-copypaste"]
+    additionalParameters = ["-Xmacros"]
+    if (useKepler) {
+      additionalParameters += ["-Ymacro-debug", "-Ymacro-copypaste"]
+    }
   }
 }
 
@@ -35,6 +48,26 @@ idea {
 
 test {
   testLogging.showStandardStreams = true
+}
+
+if (useKepler) {
+  task buildKepler {
+    inputs.property "kepler version", {
+      def ps = "git describe".execute(null, keplerDir)
+      ps.inputStream.text
+    }
+    outputs.dir "$keplerDir/dists/latest/lib"
+    doLast {
+      //ant.ant(dir: keplerDir, antfile: "build.xml", target: "fastdist", inheritAll: false)
+      exec {
+        environment "ANT_OPTS", "-Xms512M -Xmx2048M -Xss1M -XX:MaxPermSize=128M"
+        workingDir = keplerDir
+        executable = "ant"
+        args "fastdist"
+      }
+    }
+  }
+  compileScala.dependsOn(buildKepler)
 }
 
 task wrapper(type: Wrapper) {
