@@ -43,7 +43,7 @@ Person(Fred,42)
 
 ## Getting Started
 
-Currently, Expecty is based on the Scala Macros fork of Scala (https://github.com/scalamacros/kepler). The goal is to get it to work with the upcoming Scala 2.10 proper (possibly already with a milestone). Because there are no binaries published for the Scala Macros fork, its GitHub repo needs to be added as a Git submodule, and the Expecty build will take care of building a Scala distribution from it.
+Currently, Expecty is based on the Scala Macros fork (https://github.com/scalamacros/kepler). The goal is to get it to work with the upcoming Scala 2.10 (possibly already with a milestone). Because there are no binaries published for the Scala Macros fork, its GitHub repo needs to be added as a Git submodule, and the Expecty build will take care of building a Scala distribution from it.
 
     $ git checkout git@github.com:pniederw/expecty.git
     $ git submodule init
