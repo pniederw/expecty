@@ -1,36 +1,23 @@
-/*
- * Copyright 2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.expecty
 
-import org.expecty.Expecty._
-
-import org.junit.Test
-import org.junit.Ignore
+import org.junit.Assert._
+import org.junit.{Ignore, Test}
+import junit.framework.ComparisonFailure
 
 class ExpectyRenderingSpec {
-  implicit def result2TestResult(result: Result) = TestResult(result)
-  implicit var opts = Options().noFail
+  val expect = new Expecty()
 
   @Test
   def literals() {
-    expect {
-      "abc".length() == 2
-    } outputs """
+    outputs("""
 "abc".length() == 2
       |        |
       3        false
-    """
+    """) {
+      expect {
+        "abc".length() == 2
+      }
+    }
   }
 
   // TODO
@@ -38,98 +25,112 @@ class ExpectyRenderingSpec {
   // would be nice if we didn’t show list 'literals' at all
   @Test
   def object_apply() {
-    expect {
-      List() == List(1, 2)
-    } outputs """
+    outputs("""
 List() == List(1, 2)
     |  |  |
     |  |  List(1, 2)
     |  false
     List()
-    """
+    """) {
+      expect {
+        List() == List(1, 2)
+      }
+    }
   }
 
   @Test
   def infix_operators() {
     val str = "abc"
 
-    expect {
-      str + "def" == "other"
-    } outputs """
+    outputs("""
 str + "def" == "other"
 |   |       |
 abc abcdef  false
-    """
+    """) {
+      expect {
+        str + "def" == "other"
+      }
+    }
   }
 
   @Test
   def null_value() {
     val x = null
 
-    expect {
-      x == "null"
-    } outputs """
+    outputs("""
 x == "null"
 | |
 | false
 null
-    """
+    """) {
+      expect {
+        x == "null"
+      }
+    }
   }
 
   @Test
   def value_with_type_hint() {
-    opts = opts.showTypes
+    val expect = new Expecty(showTypes = true)
     val x = "123"
 
-    expect {
-      x == 123
-    } outputs  """
+    outputs("""
 x == 123
 | |
 | false (java.lang.Boolean)
 123 (java.lang.String)
-    """
+    """) {
+      expect {
+        x == 123
+      }
+    }
   }
 
   @Test
   def arithmetic_expressions() {
     val one = 1
 
-    expect {
-      one + 2 == 4
-    } outputs """
+    outputs("""
 one + 2 == 4
 |   |   |
 1   3   false
-    """
+    """) {
+      expect {
+        one + 2 == 4
+      }
+    }
   }
 
   @Test
   def property_read() {
     val person = Person()
 
-    expect {
-      person.age == 43
-    } outputs """
+    outputs("""
 person.age == 43
 |      |   |
 |      42  false
 Person(Fred,42)
-    """
+    """) {
+      expect {
+        person.age == 43
+      }
+    }
   }
 
   @Test
   def method_call_zero_args() {
     val person = Person()
 
-    expect {
-      person.doIt() == "pending"
-    } outputs """
+    outputs("""
 person.doIt() == "pending"
 |      |      |
 |      done   false
 Person(Fred,42)
-    """
+    """) {
+      expect {
+        person.doIt() == "pending"
+      }
+    }
   }
 
   @Test
@@ -137,14 +138,16 @@ Person(Fred,42)
     val person = Person()
     val word = "hey"
 
-    expect {
-      person.sayTwice(word) == "hoho"
-    } outputs """
+    outputs("""
 person.sayTwice(word) == "hoho"
 |      |        |     |
 |      heyhey   hey   false
 Person(Fred,42)
-    """
+    """) {
+      expect {
+        person.sayTwice(word) == "hoho"
+      }
+    }
   }
 
   @Test
@@ -153,14 +156,16 @@ Person(Fred,42)
     val word1 = "hey"
     val word2 = "ho"
 
-    expect {
-      person.sayTwo(word1, word2) == "hoho"
-    } outputs """
+    outputs("""
 person.sayTwo(word1, word2) == "hoho"
 |      |      |      |      |
 |      heyho  hey    ho     false
 Person(Fred,42)
-    """
+    """) {
+      expect {
+        person.sayTwo(word1, word2) == "hoho"
+      }
+    }
   }
 
   @Test
@@ -170,24 +175,24 @@ Person(Fred,42)
     val word2 = "bar"
     val word3 = "baz"
 
-    expect {
-      person.sayAll(word1, word2, word3) == "hoho"
-    } outputs """
+    outputs("""
 person.sayAll(word1, word2, word3) == "hoho"
 |      |      |      |      |      |
 |      |      foo    bar    baz    false
 |      foobarbaz
 Person(Fred,42)
-    """
+    """) {
+      expect {
+        person.sayAll(word1, word2, word3) == "hoho"
+      }
+    }
   }
 
   @Test
   def nested_property_reads_and_method_calls() {
     val person = Person()
 
-    expect {
-      person.sayTwo(person.sayTwice(person.name), "bar") == "hoho"
-    } outputs """
+    outputs("""
 person.sayTwo(person.sayTwice(person.name), "bar") == "hoho"
 |      |      |      |        |      |             |
 |      |      |      FredFred |      Fred          false
@@ -195,21 +200,43 @@ person.sayTwo(person.sayTwice(person.name), "bar") == "hoho"
 |      FredFredbar
 Person(Fred,42)
 
-    """
+    """) {
+      expect {
+        person.sayTwo(person.sayTwice(person.name), "bar") == "hoho"
+      }
+    }
   }
 
   // TODO
   @Test
   @Ignore
   def implicit_conversion() {
-    expect {
-      "fred".slice(1, 2) == "frog"
-    } outputs """
+    outputs("""
 "fred".slice(1, 2) == "frog"
 |      |           |
 |red   r           false
 scala.Predef$@5bcdbf6
-      """
+      """) {
+      expect {
+        "fred".slice(1, 2) == "frog"
+      }
+    }
+  }
+
+  def outputs(rendering: String)(expectation: => Boolean) {
+    try {
+      expectation
+      fail("Expectation should have failed but didn't")
+    }
+    catch  {
+      case e: AssertionError => {
+        val expected = rendering.trim()
+        val actual = e.getMessage.trim()
+        if (actual != expected) {
+          throw new ComparisonFailure("Expectation output doesn't match", expected, actual)
+        }
+      }
+    }
   }
 
   case class Person(name: String = "Fred", age: Int = 42) {

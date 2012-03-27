@@ -5,11 +5,14 @@ Expecty brings power assertions as known from [Groovy](http://groovy.codehaus.or
 ## Examples
 
 ```scala
+import org.expecty.Expecty
+
 case class Person(name: String = "Fred", age: Int = 42) {
   def say(words: String*) = words.mkString(" ")
 }
 
 val person = Person()
+val expect = new Expecty()
 
 // Passing expectations
 
@@ -31,12 +34,38 @@ expect {
 /*
 Output:
 
-java.lang.AssertionError: 
+java.lang.AssertionError:
 
 person.say(word1, word2) == "pong pong"
 |      |   |      |      |
 |      |   ping   pong   false
 |      ping pong
+Person(Fred,42)
+*/
+
+// Continue despite failing predicate
+
+val expect2 = new Expecty(failEarly = false)
+
+expect2 {
+  person.name == "Frog"
+  person.age * 2 == 73
+}
+
+/*
+Output:
+
+java.lang.AssertionError:
+
+person.name == "Frog"
+|      |    |
+|      Fred false
+Person(Fred,42)
+
+
+person.age * 2 == 73
+|      |   |   |
+|      42  84  false
 Person(Fred,42)
 */
 ```
