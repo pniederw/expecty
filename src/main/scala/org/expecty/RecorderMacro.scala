@@ -20,32 +20,77 @@ object RecorderMacro {
   def apply(c: Context)(recording: c.Expr[Boolean]): c.Expr[Boolean] = {
     import c.mirror._
 
-    val exprs = splitExpressions(c)(recording)
-    val recordedExprs = exprs.flatMap { expr =>
-      val buggedExpr = bugExpression(c)(expr)
-      val text = getText(c)(expr)
-      val ast = showRaw(expr)
+    Block(declareRuntime(c) :: recordExpressions(c)(recording), completeRecording(c))
+  }
 
-      val resetCall = Apply(Select(Ident(newTermName("$org_expecty_recorderRuntime")), newTermName("resetValues")), List())
-      val recordCall = Apply(Select(Ident(newTermName("$org_expecty_recorderRuntime")), newTermName("recordExpression")), List(c.literal(text).tree, c.literal(ast).tree, buggedExpr))
-
-      // why can't use tuple here?
-      List(resetCall, recordCall)
-    }
+  private def declareRuntime(c: Context): c.Tree = {
+    import c.mirror._
 
     val runtimeClass = staticClass(classOf[RecorderRuntime].getName)
-    val runtimeDecl = ValDef(
+    ValDef(
       Modifiers(),
       newTermName("$org_expecty_recorderRuntime"),
       TypeTree(runtimeClass.asType),
-      Apply(Select(New(Ident(runtimeClass)), newTermName("<init>")), List(Select(c.prefix, newTermName("listener")))))
-
-    val completeCall = Apply(Select(Ident(newTermName("$org_expecty_recorderRuntime")), newTermName("completeRecording")), List())
-
-    Block(runtimeDecl :: recordedExprs, completeCall)
+      Apply(
+        Select(
+          New(Ident(runtimeClass)),
+          newTermName("<init>")),
+        List(
+          Select(
+            c.prefix,
+            newTermName("listener")))))
   }
 
-  private[this] def splitExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
+  private def recordExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
+    import c.mirror._
+
+    val exprs = splitExpressions(c)(recording)
+    exprs.flatMap { expr =>
+      val text = getText(c)(expr)
+      val ast = showRaw(expr)
+      try {
+        List(resetValues(c), recordExpression(c)(text, ast, expr))
+      } catch {
+        case e => throw new RuntimeException(
+          "Expecty: Error rewriting expression.\nText: " + text + "\nAST : " + ast, e)
+      }
+    }
+  }
+
+  private def completeRecording(c: Context): c.Tree = {
+    import c.mirror._
+
+    Apply(
+      Select(
+        Ident(newTermName("$org_expecty_recorderRuntime")),
+        newTermName("completeRecording")),
+      List())
+  }
+
+  private def resetValues(c: Context) = {
+    import c.mirror._
+
+    Apply(
+      Select(
+        Ident(newTermName("$org_expecty_recorderRuntime")),
+        newTermName("resetValues")),
+      List())
+  }
+
+  private def recordExpression(c: Context)(text: String, ast: String, expr: c.Tree) = {
+    import c.mirror._
+
+    Apply(
+      Select(
+        Ident(newTermName("$org_expecty_recorderRuntime")),
+        newTermName("recordExpression")),
+      List(
+        c.literal(text).tree,
+        c.literal(ast).tree,
+        bugExpression(c)(expr)))
+  }
+
+  private def splitExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
     import c.mirror._
 
     recording match {
@@ -54,7 +99,7 @@ object RecorderMacro {
     }
   }
 
-  private[this] def bugExpression(c: Context)(expr: c.Tree) : c.Tree = {
+  private def bugExpression(c: Context)(expr: c.Tree) : c.Tree = {
     import c.mirror._
 
     expr match {
@@ -67,25 +112,29 @@ object RecorderMacro {
     }
   }
 
-  private[this] def bugExpressions(c: Context)(exprs: List[c.Tree]) : List[c.Tree] = exprs.map(bugExpression(c)(_))
+  private def bugExpressions(c: Context)(exprs: List[c.Tree]) : List[c.Tree] = exprs.map(bugExpression(c)(_))
 
-  private[this] def recordValue(c: Context)(expr: c.Tree, tpe: c.Type, anchor: Int) : c.Tree = {
+  private def recordValue(c: Context)(expr: c.Tree, tpe: c.Type, anchor: Int) : c.Tree = {
     import c.mirror._
 
     if (tpe.typeSymbol.isType)
-      Apply(Select(Ident(newTermName("$org_expecty_recorderRuntime")), newTermName("recordValue")), List(expr, Literal(Constant(anchor))))
+      Apply(
+        Select(
+          Ident(newTermName("$org_expecty_recorderRuntime")),
+          newTermName("recordValue")),
+        List(expr, Literal(Constant(anchor))))
     else expr
   }
 
-  private[this] def getText(c: Context)(expr: c.Tree): String = expr.pos match {
+  private def getText(c: Context)(expr: c.Tree): String = expr.pos match {
     case p: RangePosition => c.echo("RangePosition found!"); p.lineContent.slice(p.start, p.end)
     case p: scala.tools.nsc.util.Position => p.lineContent
   }
 
-  private[this] def getAnchor(c: Context)(expr: c.Tree): Int = {
+  private def getAnchor(c: Context)(expr: c.Tree): Int = {
     val pos = getPosition(c)(expr)
     pos.point - pos.source.lineToOffset(pos.line - 1)
   }
 
-  private[this] def getPosition(c: Context)(expr: c.Tree) = expr.pos.asInstanceOf[scala.tools.nsc.util.Position]
+  private def getPosition(c: Context)(expr: c.Tree) = expr.pos.asInstanceOf[scala.tools.nsc.util.Position]
 }
