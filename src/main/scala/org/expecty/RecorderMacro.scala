@@ -107,6 +107,7 @@ object RecorderMacro {
       // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
       case Select(x@This(_), y) if getPosition(c)(expr).point == getPosition(c)(x).point => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr))
       case Select(x, y) => recordValue(c)(Select(bugExpression(c)(x), y), expr.tpe, getAnchor(c)(expr))
+      case New(x) => expr // only record after ctor call
       case Literal(_) => expr // don't record
       case _ => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr))
     }

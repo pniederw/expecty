@@ -46,7 +46,7 @@ compileTestScala {
   scalaCompileOptions.with {
     //loggingLevel = "debug"
     //loggingPhases = ["namer", "typer", "pickler", "explicitouter", "lambdalift"]
-    additionalParameters = ["-Yrangepos"]
+    additionalParameters = ["-Yrangepos"] //, "-Ylog:icode", "-Ydebug"]
   }
 }
 

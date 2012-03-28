@@ -51,6 +51,20 @@ List() == List(1, 2)
     }
   }
 
+  // TODO
+  @Test
+  def object_apply_2() {
+    outputs("""
+List(1, 2) == List()
+|          |      |
+List(1, 2) false  List()
+    """) {
+      expect {
+        List(1, 2) == List()
+      }
+    }
+  }
+
   @Test
   def infix_operators() {
     val str = "abc"
@@ -220,6 +234,22 @@ Person(Fred,42)
     }
   }
 
+  @Test
+  def constructor_call() {
+    val brand = "BMW"
+    val model = "M5"
+
+    outputs("""
+new Car(brand, model).brand == "Audi"
+|       |      |      |     |
+BMW M5  BMW    M5     BMW   false
+    """) {
+      expect {
+        new Car(brand, model).brand == "Audi"
+      }
+    }
+  }
+
   // TODO
   @Test
   @Ignore
@@ -258,4 +288,9 @@ scala.Predef$@5bcdbf6
     def sayTwo(word1: String,  word2: String) = word1 + word2
     def sayAll(words: String*) = words.mkString("")
   }
+
+  class Car(val brand: String, val model: String) {
+    override def toString = brand + " " + model
+  }
 }
+
