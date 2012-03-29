@@ -14,20 +14,29 @@
 package org.expecty
 
 import collection.mutable.ListBuffer
+import collection.immutable.TreeMap
 import reflect.runtime.Mirror
 
 class ExpressionRenderer(showTypes: Boolean) {
   def render(recordedExpr: RecordedExpression[_]): String = {
     val offset = recordedExpr.text.prefixLength(_.isWhitespace)
-    val intro = new StringBuilder().append("\n\n").append(recordedExpr.text.trim())
+    val intro = new StringBuilder().append(recordedExpr.text.trim())
     val lines = ListBuffer(new StringBuilder)
 
-    val rightToLeft = recordedExpr.recordedValues.sortWith(_.anchor > _.anchor)
+    val rightToLeft = filterAndSortByAnchor(recordedExpr.recordedValues)
     for (recordedValue <- rightToLeft) placeValue(lines, recordedValue.value, recordedValue.anchor - offset)
 
     lines.prepend(intro)
     lines.append(new StringBuilder)
     lines.mkString("\n")
+  }
+
+  private[this] def filterAndSortByAnchor(recordedValues: List[RecordedValue]): Traversable[RecordedValue] = {
+    var map = TreeMap[Int, RecordedValue]()(Ordering.by(-_))
+    // values stemming from compiler generated code have the same anchor as regular values,
+    // and apparently tend to get recorded before them; let's filter them out
+    for (value <- recordedValues) if (!map.contains(value.anchor)) map += (value.anchor -> value)
+    map.values
   }
 
   private[this] def placeValue(lines: ListBuffer[StringBuilder], value: Any, col: Int) {
