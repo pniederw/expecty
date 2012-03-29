@@ -14,11 +14,11 @@
 package org.expecty
 
 import org.junit.Assert._
-import org.junit.{Ignore, Test}
+import org.junit.Test
 import junit.framework.ComparisonFailure
 
 class ExpectyRenderingSpec {
-  val expect = new Expecty()
+  val expect = new Expecty(printAsts = true)
 
   @Test
   def literals() {
@@ -250,15 +250,31 @@ BMW M5  BMW    M5     BMW   false
     }
   }
 
-  // TODO
   @Test
-  @Ignore
+  def higher_order_methods() {
+    outputs("""
+a.map(_ * 2) == b
+|    |  |    |  |
+|    |  |    |  List(2, 4, 7)
+|    |  |    false
+|    |  <function1>
+|    List(2, 4, 6)
+List(1, 2, 3)
+    """) {
+      val a = List(1, 2, 3)
+      val b = List(2, 4, 7)
+      expect {
+        a.map(_ * 2) == b
+      }
+    }
+  }
+
+  @Test
   def implicit_conversion() {
     outputs("""
 "fred".slice(1, 2) == "frog"
 |      |           |
-|red   r           false
-scala.Predef$@5bcdbf6
+fred   r           false
       """) {
       expect {
         "fred".slice(1, 2) == "frog"
@@ -274,7 +290,7 @@ scala.Predef$@5bcdbf6
     catch  {
       case e: AssertionError => {
         val expected = rendering.trim()
-        val actual = e.getMessage.trim()
+        val actual = e.getMessage.trim().replaceAll("@[0-9a-f]*", "@\\.\\.\\.")
         if (actual != expected) {
           throw new ComparisonFailure("Expectation output doesn't match", expected, actual)
         }
