@@ -80,6 +80,12 @@ object RecorderMacro {
   private def recordExpression(c: Context)(text: String, ast: String, expr: c.Tree) = {
     import c.mirror._
 
+    val buggedExpr = bugExpression(c)(expr, true)
+    c.echo("Expression  : " + text.trim())
+    c.echo("Original AST: " + ast)
+    c.echo("Bugged AST  : " + showRaw(buggedExpr))
+    c.echo("")
+
     Apply(
       Select(
         Ident(newTermName("$org_expecty_recorderRuntime")),
@@ -87,7 +93,7 @@ object RecorderMacro {
       List(
         c.literal(text).tree,
         c.literal(ast).tree,
-        bugExpression(c)(expr)))
+        buggedExpr))
   }
 
   private def splitExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
@@ -99,26 +105,27 @@ object RecorderMacro {
     }
   }
 
-  private def bugExpression(c: Context)(expr: c.Tree) : c.Tree = {
+  private def bugExpression(c: Context)(expr: c.Tree, record: Boolean) : c.Tree = {
     import c.mirror._
 
     expr match {
-      case Apply(x, ys) => recordValue(c)(Apply(bugExpression(c)(x), bugExpressions(c)(ys)), expr.tpe, getAnchor(c)(x))
+      case Apply(x, ys) => recordValue(c)(Apply(bugExpression(c)(x, true), bugExpressions(c)(ys, true)), expr.tpe, getAnchor(c)(x), record)
+      case TypeApply(x, ys) => recordValue(c)(TypeApply(bugExpression(c)(x, false), ys), expr.tpe, getAnchor(c)(x), record)
       // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
-      case Select(x@This(_), y) if getPosition(c)(expr).point == getPosition(c)(x).point => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr))
-      case Select(x, y) => recordValue(c)(Select(bugExpression(c)(x), y), expr.tpe, getAnchor(c)(expr))
-      case New(x) => expr // only record after ctor call
+      case Select(x@This(_), y) if getPosition(c)(expr).point == getPosition(c)(x).point => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr), record)
+      case Select(x, y) => recordValue(c)(Select(bugExpression(c)(x, true), y), expr.tpe, getAnchor(c)(expr), record)
+      case New(_) => expr // only record after ctor call
       case Literal(_) => expr // don't record
-      case _ => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr))
+      case _ => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr), record)
     }
   }
 
-  private def bugExpressions(c: Context)(exprs: List[c.Tree]) : List[c.Tree] = exprs.map(bugExpression(c)(_))
+  private def bugExpressions(c: Context)(exprs: List[c.Tree], record: Boolean) : List[c.Tree] = exprs.map(bugExpression(c)(_, record))
 
-  private def recordValue(c: Context)(expr: c.Tree, tpe: c.Type, anchor: Int) : c.Tree = {
+  private def recordValue(c: Context)(expr: c.Tree, tpe: c.Type, anchor: Int, record: Boolean) : c.Tree = {
     import c.mirror._
 
-    if (tpe.typeSymbol.isType)
+    if (record && tpe.typeSymbol.isType)
       Apply(
         Select(
           Ident(newTermName("$org_expecty_recorderRuntime")),
