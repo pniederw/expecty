@@ -33,17 +33,13 @@ class ExpectyRenderingSpec {
     }
   }
 
-  // TODO
-  // zero-arg is broken
-  // would be nice if we didn’t show list 'literals' at all
   @Test
   def object_apply() {
     outputs("""
 List() == List(1, 2)
-    |  |  |
-    |  |  List(1, 2)
-    |  false
-    List()
+       |  |
+       |  List(1, 2)
+       false
     """) {
       expect {
         List() == List(1, 2)
@@ -51,13 +47,12 @@ List() == List(1, 2)
     }
   }
 
-  // TODO
   @Test
   def object_apply_2() {
     outputs("""
 List(1, 2) == List()
-|          |      |
-List(1, 2) false  List()
+|          |
+List(1, 2) false
     """) {
       expect {
         List(1, 2) == List()
@@ -254,12 +249,14 @@ BMW M5  BMW    M5     BMW   false
   def higher_order_methods() {
     outputs("""
 a.map(_ * 2) == b
-|    |  |    |  |
-|    |  |    |  List(2, 4, 7)
-|    |  |    false
-|    |  <function1>
-|    List(2, 4, 6)
+| |  |  |    |  |
+| |  |  |    |  List(2, 4, 7)
+| |  |  |    false
+| |  |  <function1>
+| |  scala.collection.generic.GenTraversableFactory$ReusableCBF@...
+| List(2, 4, 6)
 List(1, 2, 3)
+
     """) {
       val a = List(1, 2, 3)
       val b = List(2, 4, 7)

@@ -23,7 +23,7 @@ object RecorderMacro {
     Block(declareRuntime(c) :: recordExpressions(c)(recording), completeRecording(c))
   }
 
-  private def declareRuntime(c: Context): c.Tree = {
+  private[this] def declareRuntime(c: Context): c.Tree = {
     import c.mirror._
 
     val runtimeClass = staticClass(classOf[RecorderRuntime].getName)
@@ -41,7 +41,7 @@ object RecorderMacro {
             newTermName("listener")))))
   }
 
-  private def recordExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
+  private[this] def recordExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
     import c.mirror._
 
     val exprs = splitExpressions(c)(recording)
@@ -57,7 +57,7 @@ object RecorderMacro {
     }
   }
 
-  private def completeRecording(c: Context): c.Tree = {
+  private[this] def completeRecording(c: Context): c.Tree = {
     import c.mirror._
 
     Apply(
@@ -67,7 +67,7 @@ object RecorderMacro {
       List())
   }
 
-  private def resetValues(c: Context) = {
+  private[this] def resetValues(c: Context) = {
     import c.mirror._
 
     Apply(
@@ -77,10 +77,10 @@ object RecorderMacro {
       List())
   }
 
-  private def recordExpression(c: Context)(text: String, ast: String, expr: c.Tree) = {
+  private[this] def recordExpression(c: Context)(text: String, ast: String, expr: c.Tree) = {
     import c.mirror._
 
-    val buggedExpr = bugExpression(c)(expr, true)
+    val buggedExpr = recordAllValues(c)(expr)
     c.echo("Expression  : " + text.trim())
     c.echo("Original AST: " + ast)
     c.echo("Bugged AST  : " + showRaw(buggedExpr))
@@ -96,7 +96,7 @@ object RecorderMacro {
         buggedExpr))
   }
 
-  private def splitExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
+  private[this] def splitExpressions(c: Context)(recording: c.Tree): List[c.Tree] = {
     import c.mirror._
 
     recording match {
@@ -105,43 +105,57 @@ object RecorderMacro {
     }
   }
 
-  private def bugExpression(c: Context)(expr: c.Tree, record: Boolean) : c.Tree = {
+  private[this] def recordAllValues(c: Context)(expr: c.Tree) : c.Tree = {
     import c.mirror._
 
     expr match {
-      case Apply(x, ys) => recordValue(c)(Apply(bugExpression(c)(x, true), bugExpressions(c)(ys, true)), expr.tpe, getAnchor(c)(x), record)
-      case TypeApply(x, ys) => recordValue(c)(TypeApply(bugExpression(c)(x, false), ys), expr.tpe, getAnchor(c)(x), record)
-      // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
-      case Select(x@This(_), y) if getPosition(c)(expr).point == getPosition(c)(x).point => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr), record)
-      case Select(x, y) => recordValue(c)(Select(bugExpression(c)(x, true), y), expr.tpe, getAnchor(c)(expr), record)
       case New(_) => expr // only record after ctor call
       case Literal(_) => expr // don't record
-      case _ => recordValue(c)(expr, expr.tpe, getAnchor(c)(expr), record)
+      // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
+      case Select(x@This(_), y) if getPosition(c)(expr).point == getPosition(c)(x).point => expr
+      case _ => recordValue(c)(recordSubValues(c)(expr), expr)
     }
   }
 
-  private def bugExpressions(c: Context)(exprs: List[c.Tree], record: Boolean) : List[c.Tree] = exprs.map(bugExpression(c)(_, record))
-
-  private def recordValue(c: Context)(expr: c.Tree, tpe: c.Type, anchor: Int, record: Boolean) : c.Tree = {
+  private[this] def recordSubValues(c: Context)(expr: c.Tree) : c.Tree = {
     import c.mirror._
 
-    if (record && tpe.typeSymbol.isType)
+    expr match {
+      case Apply(x, ys) => Apply(recordAllValues(c)(x), ys.map(recordAllValues(c)(_)))
+      case TypeApply(x, ys) => recordValue(c)(TypeApply(recordSubValues(c)(x), ys), expr)
+      case Select(x, y) => Select(recordAllValues(c)(x), y)
+      case _ => expr
+    }
+  }
+
+  private[this] def recordValue(c: Context)(expr: c.Tree, origExpr: c.Tree) : c.Tree = {
+    import c.mirror._
+
+    if (origExpr.tpe.typeSymbol.isType)
       Apply(
         Select(
           Ident(newTermName("$org_expecty_recorderRuntime")),
           newTermName("recordValue")),
-        List(expr, Literal(Constant(anchor))))
+        List(expr, Literal(Constant(getAnchor(c)(origExpr)))))
     else expr
   }
 
-  private def getText(c: Context)(expr: c.Tree): String = expr.pos match {
+  private[this] def getText(c: Context)(expr: c.Tree): String = expr.pos match {
     case p: RangePosition => c.echo("RangePosition found!"); p.lineContent.slice(p.start, p.end)
     case p: scala.tools.nsc.util.Position => p.lineContent
   }
 
-  private def getAnchor(c: Context)(expr: c.Tree): Int = {
-    val pos = getPosition(c)(expr)
-    pos.point - pos.source.lineToOffset(pos.line - 1)
+  private[this] def getAnchor(c: Context)(expr: c.Tree): Int = {
+    import c.mirror._
+
+    expr match {
+      case Apply(x, ys) => getAnchor(c)(x) + 0
+      case TypeApply(x, ys) => getAnchor(c)(x) + 0
+      case _ => {
+        val pos = getPosition(c)(expr)
+        pos.point - pos.source.lineToOffset(pos.line - 1)
+      }
+    }
   }
 
   private def getPosition(c: Context)(expr: c.Tree) = expr.pos.asInstanceOf[scala.tools.nsc.util.Position]
