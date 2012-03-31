@@ -13,15 +13,15 @@
 */
 package org.expecty
 
-class Expecty(failEarly: Boolean = true, showTypes: Boolean = false, printAsts: Boolean = false) extends Recorder {
+class Expecty(failEarly: Boolean = true, showTypes: Boolean = false,
+              printAsts: Boolean = false, printExprs: Boolean = false) extends Recorder {
   class ExpectyListener extends RecorderListener[Boolean] {
     override def expressionRecorded(recordedExpr: RecordedExpression[Boolean]) {
-      if (printAsts) println(recordedExpr.ast)
-
+      lazy val rendering = new ExpressionRenderer(showTypes).render(recordedExpr)
+      if (printAsts) println(recordedExpr.ast + "\n")
+      if (printExprs) println(rendering)
       if (!recordedExpr.value && failEarly) {
-        val renderer = new ExpressionRenderer(showTypes)
-        val rendering = renderer.render(recordedExpr)
-        throw new AssertionError(rendering)
+        throw new AssertionError("\n\n" + rendering)
       }
     }
 
@@ -31,7 +31,7 @@ class Expecty(failEarly: Boolean = true, showTypes: Boolean = false, printAsts: 
         if (!failedExprs.isEmpty) {
           val renderer = new ExpressionRenderer(showTypes)
           val renderings = failedExprs.reverse.map(renderer.render(_))
-          throw new AssertionError(renderings.mkString("\n\n"))
+          throw new AssertionError("\n\n" + renderings.mkString("\n\n"))
         }
       }
     }
