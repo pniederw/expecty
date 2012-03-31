@@ -40,14 +40,13 @@ compileScala {
 compileTestScala {
   // compiler doesn't seem to like scripts
   exclude "**/ExpectyExample.scala"
-}
 
-compileTestScala {
   scalaCompileOptions.with {
     //loggingLevel = "debug"
     //loggingPhases = ["namer", "typer", "pickler", "explicitouter", "lambdalift"]
     additionalParameters = ["-Yrangepos"]
     //additionalParameters += ["-Ylog:icode", "-Ydebug"]
+    //additionalParameters += ["-verbose"]
     //useCompileDaemon=true
   }
 }

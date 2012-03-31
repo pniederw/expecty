@@ -81,10 +81,10 @@ object RecorderMacro {
     import c.mirror._
 
     val buggedExpr = recordAllValues(c)(expr)
-    c.echo("Expression  : " + text.trim())
-    c.echo("Original AST: " + ast)
-    c.echo("Bugged AST  : " + showRaw(buggedExpr))
-    c.echo("")
+    log(c)(expr, "Expression  : " + text.trim())
+    log(c)(expr, "Original AST: " + ast)
+    log(c)(expr, "Bugged AST  : " + showRaw(buggedExpr))
+    log(c)(expr, "")
 
     Apply(
       Select(
@@ -158,5 +158,9 @@ object RecorderMacro {
     }
   }
 
-  private def getPosition(c: Context)(expr: c.Tree) = expr.pos.asInstanceOf[scala.tools.nsc.util.Position]
+  private[this] def getPosition(c: Context)(expr: c.Tree) = expr.pos.asInstanceOf[scala.tools.nsc.util.Position]
+
+  private[this] def log(c: Context)(expr: c.Tree, msg: String) {
+    c.info(expr.pos, msg, false)
+  }
 }
