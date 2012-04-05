@@ -33,8 +33,8 @@ class ExpressionRenderer(showTypes: Boolean) {
 
   private[this] def filterAndSortByAnchor(recordedValues: List[RecordedValue]): Traversable[RecordedValue] = {
     var map = TreeMap[Int, RecordedValue]()(Ordering.by(-_))
-    // values stemming from compiler generated code have the same anchor as regular values,
-    // and apparently tend to get recorded before them; let's filter them out
+    // values stemming from compiler generated code often have the same anchor as regular values
+    // and get recorded before them; let's filter them out
     for (value <- recordedValues) if (!map.contains(value.anchor)) map += (value.anchor -> value)
     map.values
   }
