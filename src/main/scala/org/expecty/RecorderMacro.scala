@@ -20,7 +20,7 @@ class RecorderMacro[C <: Context](val context: C) {
   import context.mirror._
 
   def apply(recording: Expr[Boolean]): Expr[Boolean] = {
-    Block(declareRuntime :: recordExpressions(recording), completeRecording)
+    Expr(Block(declareRuntime :: recordExpressions(recording.tree), completeRecording))
   }
 
   private[this] def declareRuntime: Tree = {
@@ -35,7 +35,7 @@ class RecorderMacro[C <: Context](val context: C) {
           newTermName("<init>")),
         List(
           Select(
-            context.prefix,
+            context.prefix.tree,
             newTermName("listener")))))
   }
 
@@ -114,7 +114,7 @@ class RecorderMacro[C <: Context](val context: C) {
     else expr
 
   private[this] def getText(expr: Tree): String = expr.pos match {
-    case p: RangePosition => context.echo("RangePosition found!"); p.lineContent.slice(p.start, p.end)
+    case p: RangePosition => context.echo(expr.pos, "RangePosition found!"); p.lineContent.slice(p.start, p.end)
     case p: scala.tools.nsc.util.Position => p.lineContent
   }
 

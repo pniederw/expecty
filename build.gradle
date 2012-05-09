@@ -4,8 +4,10 @@ apply plugin: "idea"
 version = "0.1-SNAPSHOT"
 group = "org.expecty"
 
-ext.useKepler = true
-ext.keplerDir = file("kepler")
+ext {
+  useKepler = false
+  keplerDir = file("kepler")
+}
 
 repositories {
   mavenCentral()
@@ -15,17 +17,17 @@ repositories {
 }
 
 dependencies {
-    if (useKepler) {
-      scalaTools fileTree(dir: "kepler/dists/latest/lib")
-      compile files("kepler/dists/latest/lib/scala-compiler.jar")
-      compile files("kepler/dists/latest/lib/scala-library.jar")
-    } else {
-      scalaTools "org.scala-lang:scala-compiler:2.10.0-SNAPSHOT"
-      compile "org.scala-lang:scala-compiler:2.10.0-SNAPSHOT"
-      compile "org.scala-lang:scala-library:2.10.0-SNAPSHOT"
-    }
+  if (useKepler) {
+    scalaTools fileTree(dir: "kepler/dists/latest/lib")
+    compile files("kepler/dists/latest/lib/scala-compiler.jar")
+    compile files("kepler/dists/latest/lib/scala-library.jar")
+  } else {
+    scalaTools "org.scala-lang:scala-compiler:2.10.0-M3"
+    compile "org.scala-lang:scala-compiler:2.10.0-M3"
+    compile "org.scala-lang:scala-library:2.10.0-M3"
+  }
 
-    testCompile "junit:junit:4.10"
+  testCompile "junit:junit:4.10"
 }
 
 compileScala {  
@@ -52,9 +54,9 @@ compileTestScala {
 }
 
 idea {
-    project {
-        jdkName = "1.6"
-    }
+  project {
+    jdkName = "1.6"
+  }
 }
 
 test {
@@ -81,6 +83,6 @@ if (useKepler) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "1.0-milestone-9"
+  gradleVersion = "1.0-rc-3"
 }
 

@@ -15,7 +15,6 @@ package org.expecty
 
 import collection.mutable.ListBuffer
 import collection.immutable.TreeMap
-import reflect.runtime.Mirror
 
 class ExpressionRenderer(showTypes: Boolean) {
   def render(recordedExpr: RecordedExpression[_]): String = {
@@ -59,7 +58,7 @@ class ExpressionRenderer(showTypes: Boolean) {
 
   private[this] def renderValue(value: Any): String = {
     val str = if (value == null) "null" else value.toString
-    if (showTypes) str + " (" + Mirror.typeOfInstance(value).typeSymbol.fullName + ")"
+    if (showTypes) str + " (" + scala.reflect.mirror.typeOfInstance(value).typeSymbol.fullName + ")"
     else str
   }
 
