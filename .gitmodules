@@ -1,3 +1,0 @@
-[submodule "kepler"]
-	path = kepler
-	url = https://github.com/scalamacros/kepler.git
