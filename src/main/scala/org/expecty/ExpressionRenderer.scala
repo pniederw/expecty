@@ -58,7 +58,7 @@ class ExpressionRenderer(showTypes: Boolean) {
 
   private[this] def renderValue(value: Any): String = {
     val str = if (value == null) "null" else value.toString
-    if (showTypes) str + " (" + scala.reflect.mirror.typeOfInstance(value).typeSymbol.fullName + ")"
+    if (showTypes) str + " (" + value.getClass.getName + ")" // TODO: get type name the Scala way
     else str
   }
 

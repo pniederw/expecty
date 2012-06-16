@@ -11,17 +11,16 @@ repositories {
 }
 
 dependencies {
-  scalaTools "org.scala-lang:scala-compiler:2.10.0-M3"
+  scalaTools "org.scala-lang:scala-compiler:2.10.0-M4"
 
-  compile "org.scala-lang:scala-compiler:2.10.0-M3"
-  compile "org.scala-lang:scala-library:2.10.0-M3"
+  compile "org.scala-lang:scala-compiler:2.10.0-M4"
+  compile "org.scala-lang:scala-library:2.10.0-M4"
 
   testCompile "junit:junit:4.10"
 }
 
 compileScala {  
   scalaCompileOptions.with {
-    additionalParameters = ["-Xmacros"]
     //additionalParameters += ["-Ymacro-debug", "-Ymacro-copypaste"]
   }
 }
@@ -49,17 +48,11 @@ uploadArchives {
   }
 }
 
-idea {
-  project {
-    jdkName = "1.6"
-  }
-}
-
 test {
   testLogging.showStandardStreams = true
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = "1.0-rc-3"
+  gradleVersion = "1.0"
 }
 

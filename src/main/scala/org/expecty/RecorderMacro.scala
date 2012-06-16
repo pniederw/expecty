@@ -14,17 +14,16 @@
 package org.expecty
 
 import reflect.makro.Context
-import tools.nsc.util.RangePosition
 
 class RecorderMacro[C <: Context](val context: C) {
-  import context.mirror._
+  import context.universe._
 
   def apply(recording: Expr[Boolean]): Expr[Boolean] = {
-    Expr(Block(declareRuntime :: recordExpressions(recording.tree), completeRecording))
+    context.Expr(Block(declareRuntime :: recordExpressions(recording.tree), completeRecording))
   }
 
   private[this] def declareRuntime: Tree = {
-    val runtimeClass = staticClass(classOf[RecorderRuntime].getName)
+    val runtimeClass = context.mirror.staticClass(classOf[RecorderRuntime].getName)
     ValDef(
       Modifiers(),
       newTermName("$org_expecty_recorderRuntime"),
@@ -113,9 +112,10 @@ class RecorderMacro[C <: Context](val context: C) {
         List(expr, Literal(Constant(getAnchor(origExpr)))))
     else expr
 
-  private[this] def getText(expr: Tree): String = expr.pos match {
-    case p: RangePosition => context.echo(expr.pos, "RangePosition found!"); p.lineContent.slice(p.start, p.end)
-    case p: scala.tools.nsc.util.Position => p.lineContent
+  private[this] def getText(expr: Tree): String = getPosition(expr) match {
+    case p: scala.reflect.internal.util.RangePosition =>
+      context.echo(expr.pos, "RangePosition found!"); p.lineContent.slice(p.start, p.end)
+    case p: Position => p.lineContent
   }
 
   private[this] def getAnchor(expr: Tree): Int = expr match {
@@ -127,7 +127,7 @@ class RecorderMacro[C <: Context](val context: C) {
     }
   }
 
-  private[this] def getPosition(expr: Tree) = expr.pos.asInstanceOf[scala.tools.nsc.util.Position]
+  private[this] def getPosition(expr: Tree) = expr.pos.asInstanceOf[scala.reflect.internal.util.Position]
 
   private[this] def log(expr: Tree, msg: String) {
     context.info(expr.pos, msg, false)
