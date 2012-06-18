@@ -8,7 +8,7 @@ Expecty is licensed under the Apache 2 license.
 
 ## Latest Release
 
-Expecty 0.2 was released on June 18th, 2012. It requires Scala 2.0.0-M4 or higher. For Scala 2.0.0-M3 you can still use Expecty 0.1.
+Expecty 0.2 was released on June 18th, 2012. It requires Scala 2.10.0-M4 or higher. For Scala 2.10.0-M3 you can still use Expecty 0.1.
 
 ## Download
 
