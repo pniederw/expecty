@@ -2,7 +2,7 @@ apply plugin: "scala"
 apply plugin: "idea"
 apply plugin: "maven"
 
-version = "0.2"
+version = "0.3-SNAPSHOT"
 group = "org.expecty"
 
 repositories {
@@ -11,10 +11,10 @@ repositories {
 }
 
 dependencies {
-  scalaTools "org.scala-lang:scala-compiler:2.10.0-M4"
+  scalaTools "org.scala-lang:scala-compiler:2.10.0-M5"
 
-  compile "org.scala-lang:scala-reflect:2.10.0-M4"
-  compile "org.scala-lang:scala-library:2.10.0-M4"
+  compile "org.scala-lang:scala-reflect:2.10.0-M5"
+  compile "org.scala-lang:scala-library:2.10.0-M5"
 
   testCompile "junit:junit:4.10"
 }

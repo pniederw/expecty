@@ -46,7 +46,7 @@ class RecorderMacro[C <: Context](val context: C) {
       try {
         List(resetValues, recordExpression(text, ast, expr))
       } catch {
-        case e => throw new RuntimeException(
+        case e : Throwable => throw new RuntimeException(
           "Expecty: Error rewriting expression.\nText: " + text + "\nAST : " + ast, e)
       }
     }
