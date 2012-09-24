@@ -13,7 +13,7 @@
 */
 package org.expecty
 
-import reflect.makro.Context
+import reflect.macros.Context
 
 class RecorderMacro[C <: Context](val context: C) {
   import context.universe._
@@ -27,7 +27,7 @@ class RecorderMacro[C <: Context](val context: C) {
     ValDef(
       Modifiers(),
       newTermName("$org_expecty_recorderRuntime"),
-      TypeTree(runtimeClass.asType),
+      TypeTree(runtimeClass.toType),
       Apply(
         Select(
           New(Ident(runtimeClass)),
@@ -130,7 +130,7 @@ class RecorderMacro[C <: Context](val context: C) {
   private[this] def getPosition(expr: Tree) = expr.pos.asInstanceOf[scala.reflect.internal.util.Position]
 
   private[this] def log(expr: Tree, msg: String) {
-    context.info(expr.pos, msg, false)
+    context.info(expr.pos, msg, force = false)
   }
 }
 
