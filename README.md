@@ -8,7 +8,7 @@ Expecty is licensed under the Apache 2 license.
 
 ## Latest Release
 
-Expecty 0.4 was released on August 4th, 2012. It requires Scala 2.10.0-M6 or higher. For Scala 2.10.0-M5 you can still use Expecty 0.3.
+Expecty 0.5 was released on September 24th, 2012. It requires Scala 2.10.0-M7 or higher. For Scala 2.10.0-M6 you can still use Expecty 0.4.
 
 ## Download
 
@@ -18,7 +18,7 @@ For SBT builds:
 
 ```scala
 val expectyRepo = "Expecty Repository" at "https://raw.github.com/pniederw/expecty/master/m2repo/"
-val expecty = "org.expecty" % "expecty" % "0.4"
+val expecty = "org.expecty" % "expecty" % "0.5"
 ```
 
 For Maven builds:
@@ -35,7 +35,7 @@ For Maven builds:
   <dependency>
     <groupId>org.expecty</groupId>
     <artifactId>org.expecty</artifactId>
-    <version>0.4</version>
+    <version>0.5</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -54,7 +54,7 @@ repositories {
 }
 
 dependencies {
-  testCompile "org.expecty:expecty:0.4"
+  testCompile "org.expecty:expecty:0.5"
 }
 ```
 
