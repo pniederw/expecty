@@ -15,10 +15,10 @@ configurations {
 }
 
 dependencies {
-  scalaTools "org.scala-lang:scala-compiler:2.10.0-M7"
+  scalaTools "org.scala-lang:scala-compiler:2.10.0-RC1"
 
-  compile "org.scala-lang:scala-library:2.10.0-M7"
-  provided "org.scala-lang:scala-reflect:2.10.0-M7"
+  compile "org.scala-lang:scala-library:2.10.0-RC1"
+  provided "org.scala-lang:scala-reflect:2.10.0-RC1"
 
   testCompile "junit:junit:4.10"
 }
