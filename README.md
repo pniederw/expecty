@@ -1,6 +1,7 @@
 # Expecty - Power Assertions for Scala
 
-Expecty brings power assertions as known from [Groovy](http://groovy.codehaus.org) and [Spock](http://spockframework.org) to the [Scala](http://scala-lang.org) language. It is a micro library that aims to do one thing well.
+Expecty brings power assertions as known from [Groovy](http://groovy.codehaus.org) and [Spock](http://spockframework.org)
+to the [Scala](http://scala-lang.org) language. It is a micro library that aims to do one thing well.
 
 ## License
 
@@ -8,7 +9,8 @@ Expecty is licensed under the Apache 2 license.
 
 ## Latest Release
 
-Expecty 0.6 was released on October 24th, 2012. It requires Scala 2.10.0-RC1 or higher. For Scala 2.10.0-M7 you can still use Expecty 0.5.
+Expecty 0.6 was released on October 24th, 2012. It requires Scala 2.10.0-RC1 or higher. For Scala 2.10.0-M7 you can
+still use Expecty 0.5.
 
 ## Download
 
@@ -128,7 +130,8 @@ Person(Fred,42)
 
 ## Further Examples
 
-Have a look at [ExpectySpec.scala](https://github.com/pniederw/expecty/blob/master/src/test/scala/org/expecty/ExpectySpec.scala) and other specs in the same directory.
+Have a look at [ExpectySpec.scala](https://github.com/pniederw/expecty/blob/master/src/test/scala/org/expecty/ExpectySpec.scala)
+and other specs in the same directory.
 
 
  
