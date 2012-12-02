@@ -2,7 +2,7 @@ apply plugin: "scala"
 apply plugin: "idea"
 apply plugin: "maven"
 
-version = "0.7-SNAPSHOT"
+version = "0.7"
 group = "org.expecty"
 
 repositories {
