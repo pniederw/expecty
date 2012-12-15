@@ -15,9 +15,9 @@ configurations {
 }
 
 dependencies {
-  scalaTools "org.scala-lang:scala-compiler:2.10.0-RC3"
-  compile "org.scala-lang:scala-library:2.10.0-RC3"
-  provided "org.scala-lang:scala-reflect:2.10.0-RC3"
+  scalaTools "org.scala-lang:scala-compiler:2.10.0-RC5"
+  compile "org.scala-lang:scala-library:2.10.0-RC5"
+  provided "org.scala-lang:scala-reflect:2.10.0-RC5"
 
   testCompile "junit:junit:4.10"
 }
@@ -64,6 +64,6 @@ artifacts {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = "1.2"
+  gradleVersion = "1.3"
 }
 
