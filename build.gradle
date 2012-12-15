@@ -24,6 +24,10 @@ dependencies {
 
 sourceSets.main.compileClasspath += configurations.provided
 
+tasks.withType(ScalaCompile) {
+  scalaCompileOptions.useAnt = false
+}
+
 compileScala {  
   scalaCompileOptions.with {
     //additionalParameters += ["-Ymacro-debug", "-Ymacro-copypaste"]
@@ -40,7 +44,6 @@ compileTestScala {
     additionalParameters = ["-Yrangepos"]
     //additionalParameters += ["-Ylog:icode", "-Ydebug"]
     //additionalParameters += ["-verbose"]
-    //useCompileDaemon=true
   }
 }
 
