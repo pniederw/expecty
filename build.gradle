@@ -2,7 +2,7 @@ apply plugin: "scala"
 apply plugin: "idea"
 apply plugin: "maven"
 
-version = "0.7"
+version = "0.8"
 group = "org.expecty"
 
 repositories {
@@ -19,7 +19,7 @@ dependencies {
   compile "org.scala-lang:scala-library:2.10.0-RC5"
   provided "org.scala-lang:scala-reflect:2.10.0-RC5"
 
-  testCompile "junit:junit:4.10"
+  testCompile "junit:junit:4.11"
 }
 
 sourceSets.main.compileClasspath += configurations.provided
