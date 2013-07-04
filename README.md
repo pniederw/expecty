@@ -15,11 +15,27 @@ Expecty 0.9 was released on January 4th, 2013. It requires Scala 2.10.0 or highe
 
 Get Expecty from its Maven repository at https://github.com/pniederw/expecty/tree/master/m2repo.
 
-For SBT builds:
+For sbt builds:
 
 ```scala
 val expectyRepo = "Expecty Repository" at "https://raw.github.com/pniederw/expecty/master/m2repo/"
 val expecty = "org.expecty" % "expecty" % "0.9"
+```
+
+For Gradle builds:
+
+```groovy
+repositories {
+  // important: this repo has to come last
+  maven {
+    name "expecty"
+    url "https://raw.github.com/pniederw/expecty/master/m2repo/"
+  }
+}
+
+dependencies {
+  testCompile "org.expecty:expecty:0.9"
+}
 ```
 
 For Maven builds:
@@ -40,22 +56,6 @@ For Maven builds:
     <scope>test</scope>
   </dependency>
 </dependencies>
-```
-
-For Gradle builds:
-
-```groovy
-repositories {
-  // important: this repo has to come last
-  maven {
-    name "expecty"
-    url "https://raw.github.com/pniederw/expecty/master/m2repo/"
-  }
-}
-
-dependencies {
-  testCompile "org.expecty:expecty:0.9"
-}
 ```
 
 ## Code Examples
