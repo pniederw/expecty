@@ -65,6 +65,12 @@ artifacts {
     archives sourcesJar
 }
 
+idea {
+    module {
+        scopes.PROVIDED.plus += configurations.provided
+    }
+}
+
 task wrapper(type: Wrapper) {
   gradleVersion = "1.7-rc-1"
 }
