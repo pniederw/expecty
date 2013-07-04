@@ -15,7 +15,7 @@ package org.expecty
 
 import reflect.macros.Context
 
-class RecorderMacro[C <: Context](val context: C) {
+class RecorderMacro[C <: Context](val context: C, val logging:Boolean = false) {
   import context.universe._
 
   def apply(recording: Expr[Boolean]): Expr[Boolean] = {
@@ -131,13 +131,16 @@ class RecorderMacro[C <: Context](val context: C) {
   private[this] def getPosition(expr: Tree) = expr.pos.asInstanceOf[scala.reflect.internal.util.Position]
 
   private[this] def log(expr: Tree, msg: String) {
-    context.info(expr.pos, msg, force = false)
+    if(logging) context.info(expr.pos, msg, force = false)
   }
 }
 
 object RecorderMacro {
   def apply(context: Context)(recording: context.Expr[Boolean]): context.Expr[Boolean] = {
     new RecorderMacro[context.type](context).apply(recording)
+  }
+  def logged(context: Context)(recording: context.Expr[Boolean]): context.Expr[Boolean] = {
+    new RecorderMacro[context.type](context, true).apply(recording)
   }
 }
 

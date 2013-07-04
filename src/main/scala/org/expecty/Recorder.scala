@@ -20,4 +20,9 @@ import language.experimental.macros
 abstract class Recorder {
   val listener: RecorderListener[Boolean]
   def apply(recording: Boolean): Boolean = macro RecorderMacro.apply
+  def logged(recording: Boolean): Boolean = macro RecorderMacro.logged
+}
+
+trait CompileTimeLogging extends Recorder {
+  override def apply(recording: Boolean): Boolean = macro RecorderMacro.logged
 }
