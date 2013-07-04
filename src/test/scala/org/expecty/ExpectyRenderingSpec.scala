@@ -267,6 +267,64 @@ List(1, 2, 3)
   }
 
   @Test
+  def tuple() {
+    outputs("""
+(1, 2)._1 == 3
+|      |  |
+(1,2)  1  false
+      """) {
+      expect {
+          (1, 2)._1 == 3
+      }
+    }
+  }
+
+  @Test
+  def case_class() {
+    outputs("""
+Some(1).map(_ + 1) == Some(3)
+|       |     |    |  |
+Some(1) |     |    |  Some(3)
+        |     |    false
+        |     <function1>
+        Some(2)
+      """) {
+      expect {
+        Some(1).map(_ + 1) == Some(3)
+      }
+    }
+  }
+
+  @Test
+  def class_with_package() {
+    outputs("""
+collection.mutable.Map(1->"a").get(1) == "b"
+                   |   ||      |      |
+                   |   |(1,a)  |      false
+                   |   |       Some(a)
+                   |   scala.Predef$ArrowAssoc@...
+                   Map(1 -> a)
+      """) {
+      expect {
+        collection.mutable.Map(1->"a").get(1) == "b"
+      }
+    }
+  }
+
+  @Test
+  def java_static_method() {
+    outputs("""
+java.util.Collections.emptyList() == null
+                      |           |
+                      []          false
+      """) {
+      expect {
+        java.util.Collections.emptyList() == null
+      }
+    }
+  }
+
+  @Test
   def implicit_conversion() {
     outputs("""
 "fred".slice(1, 2) == "frog"
@@ -280,14 +338,15 @@ fred   r           false
   }
 
   def outputs(rendering: String)(expectation: => Boolean) {
+    def normalize(s:String) = s.trim().lines.mkString
     try {
       expectation
       fail("Expectation should have failed but didn't")
     }
     catch  {
       case e: AssertionError => {
-        val expected = rendering.trim()
-        val actual = e.getMessage.trim().replaceAll("@[0-9a-f]*", "@\\.\\.\\.")
+        val expected = normalize(rendering)
+        val actual = normalize(e.getMessage).replaceAll("@[0-9a-f]*", "@\\.\\.\\.")
         if (actual != expected) {
           throw new ComparisonFailure("Expectation output doesn't match", expected, actual)
         }
