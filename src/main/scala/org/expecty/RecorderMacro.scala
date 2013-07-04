@@ -46,7 +46,7 @@ class RecorderMacro[C <: Context](val context: C) {
       try {
         List(resetValues, recordExpression(text, ast, expr))
       } catch {
-        case e : Throwable => throw new RuntimeException(
+        case e: Throwable => throw new RuntimeException(
           "Expecty: Error rewriting expression.\nText: " + text + "\nAST : " + ast, e)
       }
     }
@@ -93,7 +93,7 @@ class RecorderMacro[C <: Context](val context: C) {
     case Literal(_) => expr // don't record
     // don't record value of implicit "this" added by compiler; couldn't find a better way to detect implicit "this" than via point
     case Select(x@This(_), y) if getPosition(expr).point == getPosition(x).point => expr
-    case x:Select if x.symbol.isModule => expr // don't try to record the value of packages
+    case x: Select if x.symbol.isModule => expr // don't try to record the value of packages
     case _ => recordValue(recordSubValues(expr), expr)
   }
 

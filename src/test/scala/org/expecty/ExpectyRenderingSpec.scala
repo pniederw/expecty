@@ -338,7 +338,8 @@ fred   r           false
   }
 
   def outputs(rendering: String)(expectation: => Boolean) {
-    def normalize(s:String) = s.trim().lines.mkString
+    def normalize(s: String) = s.trim().lines.mkString
+
     try {
       expectation
       fail("Expectation should have failed but didn't")
