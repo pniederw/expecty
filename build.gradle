@@ -3,7 +3,7 @@ apply plugin: "idea"
 apply plugin: "eclipse"
 apply plugin: "maven"
 
-version = "0.9"
+version = "0.10"
 group = "org.expecty"
 
 repositories {
@@ -15,10 +15,11 @@ configurations {
 }
 
 dependencies {
-  compile "org.scala-lang:scala-library:2.10.0"
   provided "org.scala-lang:scala-reflect:2.10.0"
+  compile "org.scala-lang:scala-library:2.10.0"
 
   testCompile "junit:junit:4.11"
+  testRuntime "org.scala-lang:scala-library:2.10.3"
 }
 
 sourceSets.main.compileClasspath += configurations.provided
@@ -34,9 +35,6 @@ compileScala {
 }
 
 compileTestScala {
-  // compiler doesn't seem to like scripts
-  exclude "**/ExpectyExample.scala"
-
   scalaCompileOptions.with {
     //loggingLevel = "debug"
     //loggingPhases = ["namer", "typer", "pickler", "explicitouter", "lambdalift"]
@@ -72,6 +70,6 @@ idea {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = "1.7-rc-1"
+  gradleVersion = "1.8"
 }
 
