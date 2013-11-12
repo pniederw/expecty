@@ -14,6 +14,7 @@
 package org.expecty
 
 import reflect.macros.Context
+import scala.util.Properties
 
 class RecorderMacro[C <: Context](val context: C) {
   import context.universe._
@@ -67,11 +68,13 @@ class RecorderMacro[C <: Context](val context: C) {
       List())
 
   private[this] def recordExpression(text: String, ast: String, expr: Tree) = {
-    val buggedExpr = recordAllValues(expr)
-    log(expr, "Expression  : " + text.trim())
-    log(expr, "Original AST: " + ast)
-    log(expr, "Bugged AST  : " + showRaw(buggedExpr))
-    log(expr, "")
+    val instrumented = recordAllValues(expr)
+    log(expr, s"""
+Expression      : ${text.trim()}
+Original AST    : $ast
+Instrumented AST: ${showRaw(instrumented)}")
+
+    """)
 
     Apply(
       Select(
@@ -80,7 +83,7 @@ class RecorderMacro[C <: Context](val context: C) {
       List(
         context.literal(text).tree,
         context.literal(ast).tree,
-        buggedExpr))
+        instrumented))
   }
 
   private[this] def splitExpressions(recording: Tree): List[Tree] = recording match {
@@ -98,7 +101,7 @@ class RecorderMacro[C <: Context](val context: C) {
   }
 
   private[this] def recordSubValues(expr: Tree) : Tree = expr match {
-    case Apply(x, ys) => Apply(recordAllValues(x), ys.map(recordAllValues(_)))
+    case Apply(x, ys) => Apply(recordAllValues(x), ys.map(recordAllValues))
     case TypeApply(x, ys) => recordValue(TypeApply(recordSubValues(x), ys), expr)
     case Select(x, y) => Select(recordAllValues(x), y)
     case _ => expr
@@ -130,8 +133,8 @@ class RecorderMacro[C <: Context](val context: C) {
 
   private[this] def getPosition(expr: Tree) = expr.pos.asInstanceOf[scala.reflect.internal.util.Position]
 
-  private[this] def log(expr: Tree, msg: String) {
-    context.info(expr.pos, msg, force = false)
+  private[this] def log(expr: Tree, msg: => String) {
+    if (Properties.propOrFalse("org.expecty.debug")) context.info(expr.pos, msg, force = false)
   }
 }
 
