@@ -337,6 +337,39 @@ fred   r           false
     }
   }
 
+  @Test
+  def option_type() {
+    outputs(
+      """
+Some(23) == Some(22)
+|        |  |
+Some(23) |  Some(22)
+         false
+      """) {
+      expect {
+        Some(23) == Some(22)
+      }
+    }
+  }
+
+  // doesn't compile, fix pending
+//  @Test
+//  def varargs_conversion() {
+//    outputs(
+//      """
+//fun1(List(1) :_*) == List(1)
+//|                 |
+//List(1)           true
+//      """)
+//    {
+//      def fun1(p: Int*) = p
+//
+//      expect {
+//        fun1(List(1) :_*) == List(1)
+//      }
+//    }
+//  }
+
   def outputs(rendering: String)(expectation: => Boolean) {
     def normalize(s: String) = s.trim().lines.mkString
 
