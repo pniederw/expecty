@@ -17,60 +17,62 @@ case class Person(name: String = "Fred", age: Int = 42) {
   def say(words: String*) = words.mkString(" ")
 }
 
-val person = Person()
-val expect = new Expecty()
+object ExpectyExample extends App {
+  val person = Person()
+  val expect = new Expecty()
 
-// Passing expectations
+  // Passing expectations
 
-expect {
-  person.name == "Fred"
-  person.age * 2 == 84
-  person.say("Hi", "from", "Expecty!") == "Hi from Expecty!"
-}
+  expect {
+    person.name == "Fred"
+    person.age * 2 == 84
+    person.say("Hi", "from", "Expecty!") == "Hi from Expecty!"
+  }
 
-// Failing expectation
+  // Failing expectation
 
-val word1 = "ping"
-val word2 = "pong"
+  val word1 = "ping"
+  val word2 = "pong"
 
-expect {
+  expect {
+    person.say(word1, word2) == "pong pong"
+  }
+
+  /*
+  Output:
+
+  java.lang.AssertionError:
+
   person.say(word1, word2) == "pong pong"
-}
+  |      |   |      |      |
+  |      |   ping   pong   false
+  |      ping pong
+  Person(Fred,42)
+  */
 
-/*
-Output:
+  // Continue despite failing predicate
 
-java.lang.AssertionError:
+  val expect2 = new Expecty(failEarly = false)
 
-person.say(word1, word2) == "pong pong"
-|      |   |      |      |
-|      |   ping   pong   false
-|      ping pong
-Person(Fred,42)
-*/
+  expect2 {
+    person.name == "Frog"
+    person.age * 2 == 73
+  }
 
-// Continue despite failing predicate
+  /*
+  Output:
 
-val expect2 = new Expecty(failEarly = false)
+  java.lang.AssertionError:
 
-expect2 {
   person.name == "Frog"
+  |      |    |
+  |      Fred false
+  Person(Fred,42)
+
+
   person.age * 2 == 73
+  |      |   |   |
+  |      42  84  false
+  Person(Fred,42)
+  */
 }
-
-/*
-Output:
-
-java.lang.AssertionError:
-
-person.name == "Frog"
-|      |    |
-|      Fred false
-Person(Fred,42)
-
-
-person.age * 2 == 73
-|      |   |   |
-|      42  84  false
-Person(Fred,42)
-*/
