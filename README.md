@@ -51,7 +51,7 @@ For Maven builds:
 <dependencies>
   <dependency>
     <groupId>org.expecty</groupId>
-    <artifactId>org.expecty</artifactId>
+    <artifactId>expecty</artifactId>
     <version>0.10</version>
     <scope>test</scope>
   </dependency>
