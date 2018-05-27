@@ -18,7 +18,7 @@ class RecorderRuntime(listener: RecorderListener[Boolean]) {
   var recordedValues: List[RecordedValue] = _
   var recordedExprs: List[RecordedExpression[Boolean]] = List.empty
 
-  def resetValues() {
+  def resetValues(): Unit = {
     recordedValues = List.empty
   }
 
@@ -29,7 +29,7 @@ class RecorderRuntime(listener: RecorderListener[Boolean]) {
     value
   }
 
-  def recordExpression(text: String, ast: String, value: Boolean) {
+  def recordExpression(text: String, ast: String, value: Boolean): Unit = {
     val recordedExpr = RecordedExpression(text, ast, value, recordedValues)
     listener.expressionRecorded(recordedExpr)
     recordedExprs = recordedExpr :: recordedExprs

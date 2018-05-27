@@ -1,0 +1,27 @@
+dist: trusty
+group: stable
+
+language: scala
+jdk: oraclejdk8
+
+scala:
+   - 2.10.7
+   - 2.11.12
+   - 2.12.6
+   - 2.13.0-M4
+
+
+# Undo _JAVA_OPTIONS environment variable
+before_script:
+  - _JAVA_OPTIONS=
+
+script: sbt ++$TRAVIS_SCALA_VERSION test
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+
+before_cache:
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt        -name "*.lock"               -delete

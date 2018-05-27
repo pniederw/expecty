@@ -11,40 +11,41 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.expecty
+package foo
 
 import org.junit.Test
+import org.expecty.Expecty
 
 class ExpectySpec {
   val expect = new Expecty()
   val name = "Hi from Expecty!"
 
   @Test
-  def passingExpectation() {
+  def passingExpectation(): Unit = {
     expect(name.length == 16)
   }
 
   @Test(expected = classOf[AssertionError])
-  def failingExpectation() {
+  def failingExpectation(): Unit = {
     expect(name.length() == 10)
   }
 
   @Test
-  def multiplePassingExpectations() {
+  def multiplePassingExpectations(): Unit = {
     expect(name.length == 16)
     expect(name.startsWith("Hi"))
     expect(name.endsWith("Expecty!"))
   }
 
   @Test(expected = classOf[AssertionError])
-  def mixedPassingAndFailingExpectations() {
+  def mixedPassingAndFailingExpectations(): Unit = {
     expect(name.length == 16)
     expect(name.startsWith("Ho"))
     expect(name.endsWith("Expecty!"))
   }
 
   @Test
-  def passingMultiExpectation() {
+  def passingMultiExpectation(): Unit = {
     expect {
       name.length == 16
       name.startsWith("Hi")
@@ -53,7 +54,7 @@ class ExpectySpec {
   }
 
   @Test(expected = classOf[AssertionError])
-  def failingMultiExpectation() {
+  def failingMultiExpectation(): Unit = {
     expect {
       name.length == 16
       name.startsWith("Ho")
@@ -62,14 +63,14 @@ class ExpectySpec {
   }
 
   //TODO: needs assertion
-  @Test(expected = classOf[AssertionError])
-  def lateFailingExpectation() {
-    def expect = new Expecty(failEarly = false)
+  // @Test(expected = classOf[AssertionError])
+  // def lateFailingExpectation(): Unit = {
+  //   def expect = new Expecty(failEarly = false)
 
-    expect {
-      name.length == 13
-      name.startsWith("Ho")
-      name.endsWith("Expcty!")
-    }
-  }
+  //   expect {
+  //     name.length == 13
+  //     name.startsWith("Ho")
+  //     name.endsWith("Expcty!")
+  //   }
+  // }
 }

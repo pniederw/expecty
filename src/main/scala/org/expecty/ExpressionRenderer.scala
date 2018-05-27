@@ -38,7 +38,7 @@ class ExpressionRenderer(showTypes: Boolean) {
     map.values
   }
 
-  private[this] def placeValue(lines: ListBuffer[StringBuilder], value: Any, col: Int) {
+  private[this] def placeValue(lines: ListBuffer[StringBuilder], value: Any, col: Int): Unit = {
     val str = renderValue(value)
 
     placeString(lines(0), "|", col)
@@ -62,7 +62,7 @@ class ExpressionRenderer(showTypes: Boolean) {
     else str
   }
 
-  private[this] def placeString(line: StringBuilder, str: String, anchor: Int) {
+  private[this] def placeString(line: StringBuilder, str: String, anchor: Int): Unit = {
     val diff = anchor - line.length
     for (i <- 1 to diff) line.append(' ')
     line.replace(anchor, anchor + str.length(), str)

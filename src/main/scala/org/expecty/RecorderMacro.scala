@@ -13,7 +13,7 @@
 */
 package org.expecty
 
-import reflect.macros.Context
+import compat._
 import scala.util.Properties
 
 class RecorderMacro[C <: Context](val context: C) {
@@ -27,16 +27,16 @@ class RecorderMacro[C <: Context](val context: C) {
     val runtimeClass = context.mirror.staticClass(classOf[RecorderRuntime].getName)
     ValDef(
       Modifiers(),
-      newTermName("$org_expecty_recorderRuntime"),
+      termName(context)("$org_expecty_recorderRuntime"),
       TypeTree(runtimeClass.toType),
       Apply(
         Select(
           New(Ident(runtimeClass)),
-          newTermName("<init>")),
+          termName(context)("<init>")),
         List(
           Select(
             context.prefix.tree,
-            newTermName("listener")))))
+            termName(context)("listener")))))
   }
 
   private[this] def recordExpressions(recording: Tree): List[Tree] = {
@@ -56,15 +56,15 @@ class RecorderMacro[C <: Context](val context: C) {
   private[this] def completeRecording: Tree =
     Apply(
       Select(
-        Ident(newTermName("$org_expecty_recorderRuntime")),
-        newTermName("completeRecording")),
+        Ident(termName(context)("$org_expecty_recorderRuntime")),
+        termName(context)("completeRecording")),
       List())
 
   private[this] def resetValues: Tree =
     Apply(
       Select(
-        Ident(newTermName("$org_expecty_recorderRuntime")),
-        newTermName("resetValues")),
+        Ident(termName(context)("$org_expecty_recorderRuntime")),
+        termName(context)("resetValues")),
       List())
 
   private[this] def recordExpression(text: String, ast: String, expr: Tree) = {
@@ -78,8 +78,8 @@ Instrumented AST: ${showRaw(instrumented)}")
 
     Apply(
       Select(
-        Ident(newTermName("$org_expecty_recorderRuntime")),
-        newTermName("recordExpression")),
+        Ident(termName(context)("$org_expecty_recorderRuntime")),
+        termName(context)("recordExpression")),
       List(
         context.literal(text).tree,
         context.literal(ast).tree,
@@ -111,16 +111,12 @@ Instrumented AST: ${showRaw(instrumented)}")
     if (origExpr.tpe.typeSymbol.isType)
       Apply(
         Select(
-          Ident(newTermName("$org_expecty_recorderRuntime")),
-          newTermName("recordValue")),
+          Ident(termName(context)("$org_expecty_recorderRuntime")),
+          termName(context)("recordValue")),
         List(expr, Literal(Constant(getAnchor(origExpr)))))
     else expr
 
-  private[this] def getText(expr: Tree): String = getPosition(expr) match {
-    case p: scala.reflect.internal.util.RangePosition =>
-      context.echo(expr.pos, "RangePosition found!"); p.lineContent.slice(p.start, p.end)
-    case p: Position => p.lineContent
-  }
+  private[this] def getText(expr: Tree): String = getPosition(expr).lineContent
 
   private[this] def getAnchor(expr: Tree): Int = expr match {
     case Apply(x, ys) => getAnchor(x) + 0
@@ -133,7 +129,7 @@ Instrumented AST: ${showRaw(instrumented)}")
 
   private[this] def getPosition(expr: Tree) = expr.pos.asInstanceOf[scala.reflect.internal.util.Position]
 
-  private[this] def log(expr: Tree, msg: => String) {
+  private[this] def log(expr: Tree, msg: => String): Unit = {
     if (Properties.propOrFalse("org.expecty.debug")) context.info(expr.pos, msg, force = false)
   }
 }
