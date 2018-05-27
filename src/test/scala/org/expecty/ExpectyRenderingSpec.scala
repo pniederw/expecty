@@ -19,7 +19,7 @@ import junit.framework.ComparisonFailure
 import org.expecty.Expecty
 
 class ExpectyRenderingSpec {
-  val expect = new Expecty(printAsts = true)
+  val assert = new Expecty(printAsts = true)
 
   @Test
   def literals(): Unit = {
@@ -28,7 +28,7 @@ class ExpectyRenderingSpec {
       |        |
       3        false
     """) {
-      expect {
+      assert {
         "abc".length() == 2
       }
     }
@@ -42,7 +42,7 @@ List() == List(1, 2)
        |  List(1, 2)
        false
     """) {
-      expect {
+      assert {
         List() == List(1, 2)
       }
     }
@@ -55,7 +55,7 @@ List(1, 2) == List()
 |          |
 List(1, 2) false
     """) {
-      expect {
+      assert {
         List(1, 2) == List()
       }
     }
@@ -70,7 +70,7 @@ str + "def" == "other"
 |   |       |
 abc abcdef  false
     """) {
-      expect {
+      assert {
         str + "def" == "other"
       }
     }
@@ -86,7 +86,7 @@ x == "null"
 | false
 null
     """) {
-      expect {
+      assert {
         x == "null"
       }
     }
@@ -118,7 +118,7 @@ one + 2 == 4
 |   |   |
 1   3   false
     """) {
-      expect {
+      assert {
         one + 2 == 4
       }
     }
@@ -134,7 +134,7 @@ person.age == 43
 |      42  false
 Person(Fred,42)
     """) {
-      expect {
+      assert {
         person.age == 43
       }
     }
@@ -150,7 +150,7 @@ person.doIt() == "pending"
 |      done   false
 Person(Fred,42)
     """) {
-      expect {
+      assert {
         person.doIt() == "pending"
       }
     }
@@ -167,7 +167,7 @@ person.sayTwice(word) == "hoho"
 |      heyhey   hey   false
 Person(Fred,42)
     """) {
-      expect {
+      assert {
         person.sayTwice(word) == "hoho"
       }
     }
@@ -185,7 +185,7 @@ person.sayTwo(word1, word2) == "hoho"
 |      heyho  hey    ho     false
 Person(Fred,42)
     """) {
-      expect {
+      assert {
         person.sayTwo(word1, word2) == "hoho"
       }
     }
@@ -205,7 +205,7 @@ person.sayAll(word1, word2, word3) == "hoho"
 |      foobarbaz
 Person(Fred,42)
     """) {
-      expect {
+      assert {
         person.sayAll(word1, word2, word3) == "hoho"
       }
     }
@@ -224,7 +224,7 @@ person.sayTwo(person.sayTwice(person.name), "bar") == "hoho"
 Person(Fred,42)
 
     """) {
-      expect {
+      assert {
         person.sayTwo(person.sayTwice(person.name), "bar") == "hoho"
       }
     }
@@ -240,7 +240,7 @@ new Car(brand, model).brand == "Audi"
 |       |      |      |     |
 BMW M5  BMW    M5     BMW   false
     """) {
-      expect {
+      assert {
         new Car(brand, model).brand == "Audi"
       }
     }
@@ -261,7 +261,7 @@ BMW M5  BMW    M5     BMW   false
 //     """) {
 //       val a = List(1, 2, 3)
 //       val b = List(2, 4, 7)
-//       expect {
+//       assert {
 //         a.map(_ * 2) == b
 //       }
 //     }
@@ -274,7 +274,7 @@ BMW M5  BMW    M5     BMW   false
 |      |  |
 (1,2)  1  false
       """) {
-      expect {
+      assert {
           (1, 2)._1 == 3
       }
     }
@@ -291,7 +291,7 @@ BMW M5  BMW    M5     BMW   false
 //         |     <function1>
 //         Some(2)
 //       """) {
-//       expect {
+//       assert {
 //         Some(1).map(_ + 1) == Some(3)
 //       }
 //     }
@@ -307,7 +307,7 @@ BMW M5  BMW    M5     BMW   false
 //                    |       scala.Predef$ArrowAssoc@...
 //                    HashMap(1 -> a)
 //       """) {
-//       expect {
+//       assert {
 //         collection.mutable.HashMap(1->"a").get(1) == "b"
 //       }
 //     }
@@ -320,7 +320,7 @@ java.util.Collections.emptyList() == null
                       |           |
                       []          false
       """) {
-      expect {
+      assert {
         java.util.Collections.emptyList() == null
       }
     }
@@ -333,7 +333,7 @@ java.util.Collections.emptyList() == null
 // |      |           |
 // fred   r           false
 //       """) {
-//       expect {
+//       assert {
 //         "fred".slice(1, 2) == "frog"
 //       }
 //     }
@@ -348,7 +348,7 @@ Some(23) == Some(22)
 Some(23) |  Some(22)
          false
       """) {
-      expect {
+      assert {
         Some(23) == Some(22)
       }
     }
@@ -366,7 +366,7 @@ Some(23) |  Some(22)
 //    {
 //      def fun1(p: Int*) = p
 //
-//      expect {
+//      assert {
 //        fun1(List(1) :_*) == List(1)
 //      }
 //    }

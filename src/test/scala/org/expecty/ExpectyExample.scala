@@ -14,7 +14,7 @@
 
 package foo
 
-import org.expecty.Expecty
+import org.expecty.Expecty, Expecty.assert
 
 case class Person(name: String = "Fred", age: Int = 42) {
   def say(words: String*) = words.mkString(" ")
@@ -22,11 +22,10 @@ case class Person(name: String = "Fred", age: Int = 42) {
 
 object ExpectyExample extends App {
   val person = Person()
-  val expect = new Expecty()
 
   // Passing expectations
 
-  expect {
+  assert {
     person.name == "Fred"
     person.age * 2 == 84
     person.say("Hi", "from", "Expecty!") == "Hi from Expecty!"
@@ -37,7 +36,7 @@ object ExpectyExample extends App {
   val word1 = "ping"
   val word2 = "pong"
 
-  expect {
+  assert {
     person.say(word1, word2) == "pong pong"
   }
 

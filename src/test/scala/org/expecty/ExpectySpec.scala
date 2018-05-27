@@ -14,39 +14,38 @@
 package foo
 
 import org.junit.Test
-import org.expecty.Expecty
+import org.expecty.Expecty.assert
 
 class ExpectySpec {
-  val expect = new Expecty()
   val name = "Hi from Expecty!"
 
   @Test
   def passingExpectation(): Unit = {
-    expect(name.length == 16)
+    assert(name.length == 16)
   }
 
   @Test(expected = classOf[AssertionError])
   def failingExpectation(): Unit = {
-    expect(name.length() == 10)
+    assert(name.length() == 10)
   }
 
   @Test
   def multiplePassingExpectations(): Unit = {
-    expect(name.length == 16)
-    expect(name.startsWith("Hi"))
-    expect(name.endsWith("Expecty!"))
+    assert(name.length == 16)
+    assert(name.startsWith("Hi"))
+    assert(name.endsWith("Expecty!"))
   }
 
   @Test(expected = classOf[AssertionError])
   def mixedPassingAndFailingExpectations(): Unit = {
-    expect(name.length == 16)
-    expect(name.startsWith("Ho"))
-    expect(name.endsWith("Expecty!"))
+    assert(name.length == 16)
+    assert(name.startsWith("Ho"))
+    assert(name.endsWith("Expecty!"))
   }
 
   @Test
   def passingMultiExpectation(): Unit = {
-    expect {
+    assert {
       name.length == 16
       name.startsWith("Hi")
       name.endsWith("Expecty!")
@@ -55,7 +54,7 @@ class ExpectySpec {
 
   @Test(expected = classOf[AssertionError])
   def failingMultiExpectation(): Unit = {
-    expect {
+    assert {
       name.length == 16
       name.startsWith("Ho")
       name.endsWith("Expecty!")

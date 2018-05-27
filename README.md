@@ -61,18 +61,17 @@ For Maven builds:
 ## Code Examples
 
 ```scala
-import org.expecty.Expecty
+import org.expecty.Expecty.assert
 
 case class Person(name: String = "Fred", age: Int = 42) {
   def say(words: String*) = words.mkString(" ")
 }
 
 val person = Person()
-val expect = new Expecty()
 
 // Passing expectations
 
-expect {
+assert {
   person.name == "Fred"
   person.age * 2 == 84
   person.say("Hi", "from", "Expecty!") == "Hi from Expecty!"
@@ -83,7 +82,7 @@ expect {
 val word1 = "ping"
 val word2 = "pong"
 
-expect {
+assert {
   person.say(word1, word2) == "pong pong"
 }
 

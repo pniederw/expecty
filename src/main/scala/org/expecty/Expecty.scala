@@ -39,3 +39,8 @@ class Expecty(failEarly: Boolean = true, showTypes: Boolean = false,
 
   val listener = new ExpectyListener
 }
+
+object Expecty {
+  lazy val assert: Expecty = new Expecty()
+  lazy val expect: Expecty = assert
+}
